@@ -2,7 +2,7 @@
 リアルタイム日本語文字起こしツール – medium モデル版
 外部 VAD + 音量フィルターでノイズ・フィラーをカット
 """
-
+from postprocess import post_process
 import os
 import queue
 import threading
@@ -16,13 +16,13 @@ from faster_whisper import WhisperModel
 # ===== 基本設定 =====
 SAMPLE_RATE = 16_000
 FRAME_MS    = 30
-CHUNK_MS    = 3_000
+CHUNK_MS    = 2_000
 BYTES_PER_FRAME = SAMPLE_RATE * 2 * FRAME_MS // 1000
 LANG = "ja"
 
 # ===== モデルパラメータ =====
-BEAM_SIZE = 12
-BEST_OF   = 7
+BEAM_SIZE = 8
+BEST_OF   = 2
 TEMP      = 0.0
 
 # ===== ノイズ & VAD =====
