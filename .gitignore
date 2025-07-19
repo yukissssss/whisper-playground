@@ -2,3 +2,8 @@
 __pycache__/
 *.wav
 *.aiff
+Code/
+VS/
+logs/
+*.bad
+bench_rt.tsv

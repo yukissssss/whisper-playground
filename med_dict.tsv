@@ -1,0 +1,5 @@
+# pattern	replace	is_regex	note
+手素	主訴	1	basic
+スポ.?2	SpO2	1	basic
+スポー?に?	SpO2	1	basic
+SpO2\s*(\d+)	SpO2 \1	1	unit
