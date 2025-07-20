@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #!/usr/bin/env python3
 """postprocess.py — Whisper 出力を整形して誤変換を補正
 
@@ -166,3 +167,50 @@ def main(argv: List[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
+=======
+import queue, threading, numpy as np, sounddevice as sd, webrtcvad
+from faster_whisper import WhisperModel
+
+SAMPLE_RATE = 16000
+FRAME_MS    = 30
+BYTES       = SAMPLE_RATE * 2 * FRAME_MS // 1000
+LANG        = "ja"
+
+model = WhisperModel("small", device="cpu", compute_type="int8")
+vad   = webrtcvad.Vad(2)
+q = queue.Queue()
+
+def audio_cb(indata, frames, time, status):
+    q.put(bytes(indata))
+
+def transcriber():
+    buf = b""
+    while True:
+        buf += q.get()
+        while len(buf) >= BYTES:
+            frame, buf = buf[:BYTES], buf[BYTES:]
+            if not vad.is_speech(frame, SAMPLE_RATE):
+                continue
+            speech = [frame]
+            while len(speech) * FRAME_MS < 500:
+                if len(buf) < BYTES:
+                    buf += q.get()
+                nxt, buf = buf[:BYTES], buf[BYTES:]
+                speech.append(nxt)
+            samples = np.frombuffer(b"".join(speech), 
+np.int16).astype(np.float32) / 32768
+            segments, _ = model.transcribe(
+                samples, language=LANG, beam_size=4, temperature=0.0
+            )
+            for seg in segments:
+                print(seg.text.strip(), flush=True)
+
+threading.Thread(target=transcriber, daemon=True).start()
+with sd.RawInputStream(samplerate=SAMPLE_RATE,
+                       dtype="int16", channels=1,
+                       blocksize=0, callback=audio_cb):
+    print("🎙️  話してください (Ctrl+C で終了)")
+    while True:
+        sd.sleep(1000)
+
+>>>>>>> 4d8ecb8 (feat: numeric-unit rule & script updates)
