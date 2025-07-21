@@ -62,7 +62,9 @@ FALLBACK_DICT: List[Tuple[str, str, int]] = [
 # TSV 辞書ロード
 # ----------------------------------------------------------------------
 
-def load_tsv_dict(path: Path) -> List[Tuple[str, str, int]]:
+def load_tsv_dict(path: Path | str | None = None) -> List[Tuple[str, str, int]]:
+    """TSV 辞書を読み込んでルールリストを返す。見つからなければ FALLBACK_DICT。"""
+    path = Path(path or "med_dict.tsv")
     if not path.exists():
         return FALLBACK_DICT
     rules: List[Tuple[str, str, int]] = []
@@ -109,16 +111,25 @@ def _insert_period(text: str) -> str:
     return text
 
 # ----------------------------------------------------------------------
-# メイン後処理関数
+# メイン後処理関数（rules 省略可）
 # ----------------------------------------------------------------------
+_DEFAULT_RULES: List[Tuple[str, str, int]] | None = None
 
-def post_process(text: str, rules: List[Tuple[str, str, int]]) -> str:
+
+def post_process(text: str, rules: List[Tuple[str, str, int]] | None = None) -> str:
+    """テキストを正規化＆辞書変換して返す。rules が None の場合は自動ロード。"""
+    global _DEFAULT_RULES
+    if rules is None:
+        if _DEFAULT_RULES is None:
+            _DEFAULT_RULES = load_tsv_dict("med_dict.tsv")
+        rules = _DEFAULT_RULES
+
     text = neologdn.normalize(text)
     for pattern, repl, is_rx in rules:
         text = re.sub(pattern, repl, text, flags=re.I) if is_rx else text.replace(pattern, repl)
 
     text = unicodedata.normalize("NFKC", text)
-    text = _unit_gap.sub(r"\1", text)
+    text = _unit_gap.sub(r" \1", text)
     text = _normalize_units(text)
 
     # CJK と英数字の間にスペースを強制挿入
