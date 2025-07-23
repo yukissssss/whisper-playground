@@ -1,4 +1,4 @@
-# pattern	replace	is_regex	note
+# pattern   replace is_regex    note
 手素	主訴	1	basic
 スポ.?2	SpO2	1	basic
 スポー?に?	SpO2	1	basic
@@ -10,3 +10,8 @@ B.?S.?M.*?5F32.*?1	DSM-5 F32.1	1	# 診断コード
 10\s*(拭く|ふく).*日	10 mg/日	1	# 用量単位
 ([\d.]+)\s*ml	\1 mL	1	# mL 単位正規化
 (\d+)\s*kg	\1 kg	1	# kg 単位にスペース
+初心	初診	1	# 初診の誤認2
+動気	動悸	1	# 動悸
+(\d+)mg\b	\1 mg	1	# mg にスペース
+PHQ-9\s*波?\s*(\d+)\s*月?\s*(\d+)\s*日?\s*点	PHQ-9 は \1/\2 点	1	# PHQ 点数(日まで許容)
+視察されます	示唆されます	1	# 誤字置換
