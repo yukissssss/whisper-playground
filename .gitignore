@@ -1,4 +1,18 @@
+# macOS
 .DS_Store
+
+# Python
 __pycache__/
+
+# 音声ファイル
 *.wav
 *.aiff
+
+# 開発用ディレクトリ
+Code/
+VS/
+logs/
+
+# 一時ファイル
+*.bad
+bench_rt.tsv
